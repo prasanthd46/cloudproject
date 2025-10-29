@@ -81,10 +81,10 @@ jobs:
       with:
         action: 'deploy'
         manifests: |
-          k8s/frontend-deployment.yaml
-          k8s/frontend-service.yaml
-          k8s/backend-deployment.yaml
-          k8s/backend-service.yaml
+          k8s/frontend-deployment.yml
+          k8s/frontend-service.yml
+          k8s/backend-deployment.yml
+          k8s/backend-service.yml
         images: |
           ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
