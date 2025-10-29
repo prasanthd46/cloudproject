@@ -13,76 +13,77 @@ env:
   BACKEND_IMAGE_NAME: backend
 
 jobs:
+  # ADD THIS JOB (SonarCloud analysis)
   sonarcloud:
     name: SonarCloud Code Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required for SonarCloud
+          fetch-depth: 0
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is automatic
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # You must set this in GitHub secrets
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  # YOUR EXISTING BUILD JOB - ONLY CHANGE: add "needs: sonarcloud"
   build-and-deploy:
-    needs: sonarcloud # Wait for SonarCloud to finish
+    needs: sonarcloud  # ADD THIS LINE
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    # ... all your existing steps stay the same ...
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }} # You must set this
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # --- THIS STEP IS SIMPLIFIED ---
-      # No username/password needed. It uses your Azure login credentials.
-      - name: ACR Login
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}
+    - name: ACR Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push Frontend Image
-        run: |
-          docker build ./Frontend -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
-          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
-          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+    - name: Build and Push Frontend Image
+      run: |
+        docker build ./Frontend -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+        docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
 
-      - name: Build and Push Backend Image
-        run: |
-          docker build ./Backend -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
-          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
-          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
+    - name: Build and Push Backend Image
+      run: |
+        docker build ./Backend -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+        docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
 
-      # --- THIS STEP IS ALREADY CORRECT ---
-      # It automatically installs kubelogin for you.
-      - name: Set AKS Context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
-          cluster-name: ${{ env.AZURE_AKS_CLUSTER_NAME }}
-          admin: 'false'
-          use-kubelogin: 'true'
+    - name: Set AKS Context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
+        cluster-name: ${{ env.AZURE_AKS_CLUSTER_NAME }}
+        admin: 'false'
+        use-kubelogin: 'true'
 
-      - name: Deploy to AKS
-        uses: Azure/k8s-deploy@v4
-        with:
-          action: 'deploy'
-          manifests: |
-            k8s/frontend-deployment.yaml
-            k8s/frontend-service.yaml
-            k8s/backend-deployment.yaml
-            k8s/backend-service.yaml
-          images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+    - name: Deploy to AKS
+      uses: Azure/k8s-deploy@v4
+      with:
+        action: 'deploy'
+        manifests: |
+          k8s/frontend-deployment.yaml
+          k8s/frontend-service.yaml
+          k8s/backend-deployment.yaml
+          k8s/backend-service.yaml
+        images: |
+          ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Azure Logout
-        run: az logout
-        if: always()
+    - name: Azure Logout
+      run: az logout
+      if: always()
