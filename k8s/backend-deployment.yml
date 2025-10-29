@@ -12,6 +12,8 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+      - name: acr-secret
       containers:
       - name: backend-container
         image: medicalreviewacrc728ea6834a6c4ef.azurecr.io/backend:latest

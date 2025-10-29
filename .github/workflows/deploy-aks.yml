@@ -60,7 +60,6 @@ jobs:
         docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
 
-    # ADD THIS STEP - Install kubelogin first
     - name: Setup kubelogin
       uses: azure/use-kubelogin@v1
       env:
@@ -75,6 +74,15 @@ jobs:
         cluster-name: ${{ env.AZURE_AKS_CLUSTER_NAME }}
         admin: 'false'
         use-kubelogin: 'true'
+
+    - name: Create ACR Image Pull Secret
+      run: |
+        kubectl create secret docker-registry acr-secret \
+          --docker-server=${{ env.AZURE_CONTAINER_REGISTRY }} \
+          --docker-username=${{ secrets.ACR_USERNAME }} \
+          --docker-password=${{ secrets.ACR_PASSWORD }} \
+          --namespace=default \
+          --dry-run=client -o yaml | kubectl apply -f -
 
     - name: Deploy to AKS
       uses: Azure/k8s-deploy@v4
