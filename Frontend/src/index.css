@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+@import "tailwindcss";
+
+@theme {
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(221.2 83.2% 53.3%);
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
+  
+  --color-primary: hsl(221.2 83.2% 53.3%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  
+  --color-secondary: hsl(210 40% 96.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  
+  --color-accent: hsl(210 40% 96.1%);
+  --color-accent-foreground: hsl(222.2 47.4% 11.2%);
+  
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 84% 4.9%);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+  
+  .btn-primary:hover {
+    background-color: hsl(221.2 83.2% 48%);
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2;
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+  }
+  
+  .btn-secondary:hover {
+    background-color: hsl(210 40% 92%);
+  }
+  
+  .btn-destructive {
+    @apply px-4 py-2;
+    background-color: var(--color-destructive);
+    color: var(--color-destructive-foreground);
+  }
+  
+  .btn-destructive:hover {
+    background-color: hsl(0 84.2% 55%);
+  }
+  
+  .btn-outline {
+    @apply border px-4 py-2;
+    border-color: var(--color-input);
+    background-color: var(--color-background);
+  }
+  
+  .btn-outline:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
+  
+  .btn-ghost {
+    @apply px-4 py-2;
+  }
+  
+  .btn-ghost:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .input {
+    @apply flex h-10 w-full rounded-md border px-3 py-2 text-sm placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: var(--color-input);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  
+  .card {
+    @apply rounded-lg border shadow-sm;
+    background-color: var(--color-card);
+    color: var(--color-card-foreground);
+  }
+  
+  .card-header {
+    @apply flex flex-col space-y-1.5 p-6;
+  }
+  
+  .card-title {
+    @apply text-2xl font-semibold leading-none tracking-tight;
+  }
+  
+  .card-description {
+    @apply text-sm;
+    color: var(--color-muted-foreground);
+  }
+  
+  .card-content {
+    @apply p-6 pt-0;
+  }
+  
+  .badge {
+    @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .badge-default {
+    @apply border-transparent;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+  
+  .badge-secondary {
+    @apply border-transparent;
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+  }
+  
+  .badge-destructive {
+    @apply border-transparent;
+    background-color: var(--color-destructive);
+    color: var(--color-destructive-foreground);
+  }
+  
+  .badge-outline {
+    color: var(--color-foreground);
+  }
+}
