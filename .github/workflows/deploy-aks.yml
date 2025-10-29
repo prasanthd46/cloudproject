@@ -13,7 +13,6 @@ env:
   BACKEND_IMAGE_NAME: backend
 
 jobs:
-  # ADD THIS JOB (SonarCloud analysis)
   sonarcloud:
     name: SonarCloud Code Quality
     runs-on: ubuntu-latest
@@ -28,12 +27,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  # YOUR EXISTING BUILD JOB - ONLY CHANGE: add "needs: sonarcloud"
   build-and-deploy:
-    needs: sonarcloud  # ADD THIS LINE
+    needs: sonarcloud
     runs-on: ubuntu-latest
     steps:
-    # ... all your existing steps stay the same ...
     - name: Checkout Code
       uses: actions/checkout@v3
 
@@ -62,6 +59,14 @@ jobs:
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
         docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
+
+    # ADD THIS STEP - Install kubelogin first
+    - name: Setup kubelogin
+      uses: azure/use-kubelogin@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        kubelogin-version: 'latest'
 
     - name: Set AKS Context
       uses: azure/aks-set-context@v3
