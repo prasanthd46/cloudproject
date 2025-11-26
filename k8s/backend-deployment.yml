@@ -16,14 +16,14 @@ spec:
       - name: acr-secret
       containers:
       - name: backend-container
-        image: medicalreviewacrc728ea6834a6c4ef.azurecr.io/backend:latest
+        image: medicalreviewacr5641343725980c14.azurecr.io/backend:latest
         ports:
         - containerPort: 5000
         env:
         - name: PORT
           value: "5000"
         - name: DB_SERVER
-          value: "medicalreview-sqlserver-c728ea6834a6c4ef.database.windows.net"
+          value: "medicalreview-sqlserver-5641343725980c14.database.windows.net"
         - name: DB_DATABASE
           value: "MedicalReview-DB"
         - name: DB_USER
@@ -33,9 +33,9 @@ spec:
         - name: AZURE_LANGUAGE_ENDPOINT
           value: "https://southeastasia.api.cognitive.microsoft.com/"
         - name: AZURE_LANGUAGE_KEY
-          value: "ddd1888eb7224652892c9e629d6bb414"
+          value: "ae84a4fcc423459a845002def1c19a67"
         - name: APPINSIGHTS_CONNECTION_STRING
-          value: "InstrumentationKey=60374f13-50f7-4d95-a8c3-ed2c6e520fb9;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=c1037fdc-176e-4537-9e0a-d78839e25048"
+          value: "InstrumentationKey=f665c474-d0c7-4494-87c2-6ff08741d0e1;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=30ce64c7-e891-41c3-b903-5b8e1a72180b"
         resources:
           requests:
             cpu: "200m"

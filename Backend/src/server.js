@@ -72,6 +72,11 @@ app.post('/api/init-db', async (req, res) => {
         Email NVARCHAR(255) NOT NULL UNIQUE,
         Role NVARCHAR(50) NOT NULL CHECK (Role IN ('HR Admin', 'Dept Head', 'Staff')),
         DepartmentID INT NULL,
+
+        PasswordHash NVARCHAR(MAX) NULL,
+        AccountStatus NVARCHAR(50) DEFAULT 'Active',
+        PasswordSet BIT DEFAULT 0,
+
         FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
       );
     `);
@@ -263,6 +268,9 @@ app.listen(PORT, async () => {
             Email NVARCHAR(255) NOT NULL UNIQUE,
             Role NVARCHAR(50) NOT NULL CHECK (Role IN ('HR Admin', 'Dept Head', 'Staff')),
             DepartmentID INT NULL,
+                PasswordHash NVARCHAR(MAX) NULL,
+    AccountStatus NVARCHAR(50) DEFAULT 'Active',
+    PasswordSet BIT DEFAULT 0,
             FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
           );
         `);
